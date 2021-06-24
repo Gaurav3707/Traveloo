@@ -8,6 +8,7 @@ from django.core.exceptions import BadRequest, ValidationError
 import pytz
 from datetime import datetime, timedelta
 import random
+from Traveloo.settings import SECRET_KEY
 
 
 
@@ -64,8 +65,6 @@ class UserServices():
 
             if now_date == otp_date and now_time <= otp_time:
                 if user.otp_varification == False:
-                    user.profile_completion =  str(round((float(user.profile_completion) + 7.692),3))
-                    user.profile_status = 2
                     user.is_active = True
                     user.otp_varification = True
                 
@@ -119,4 +118,34 @@ class UserServices():
             return "Success"
         except Exception as e:
             raise ValidationError({"error":e})
+
+    def user_login(self, request, format=None):
+        email = request.POST['email']
+        password = request.POST['password']
+        print(email,password)
+        try:
+            email = request.POST['email']
+            password = request.POST['password']
+            try:
+                user = User.objects.get(email=email)
+                if user.check_password(password):
+                    print('--------------------------USER AUTHENTICATED----------------------')
+                    result = 'success'
+
+                    return result
+                else:
+                    print('--------------------------Wrong Credentials----------------------')
+                    result = 'Wrong Credentials'
+                    return result
+            except User.DoesNotExist:
+                result = 'User not found'
+                return result
+                    
+
+                    
+
+        except Exception as e:
+            print(e)
+            result = 'Some Error Occured'
+            return result
             
